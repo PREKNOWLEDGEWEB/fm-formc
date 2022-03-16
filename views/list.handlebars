@@ -69,6 +69,9 @@
 			if (ajson.is_active == false) {
 				window.location.href = "/@logout";
 			}
+			if (ajson.is_admin == false) {
+				$('#admin_settings').remove();
+			}
 		}
 	});
 	function pm2($name){
@@ -120,6 +123,10 @@
 			return;
 		}
 		if ($i.endsWith(".creeper/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.includes(".console_history")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}

@@ -28,6 +28,7 @@ const handlebars = require("handlebars");
 
 const port = +config_.PORT || 8080;
 const user_store = require('data-store')({ path: process.cwd() + '/config_users.json' });
+const sd_ = require('data-store')({ path: process.cwd() + '/serious-dedication-json.json' });
 
 const app = express();
 const http = app.listen(port);
@@ -118,6 +119,12 @@ app.get("/@logout", (req, res) => {
 app.get("/@login", (req, res) => {
   res.render("login", flashify(req, {}));
 });
+app.get("/@settings", (req, res) => {
+  if (req.session.login !== true) {
+    res.redirect("/@login");
+  }
+  res.render("settings", flashify(req, {}));
+});
 app.get("/@edit_file", (req, res) => {
   if (req.session.login !== true) {
     res.redirect("/@login");
@@ -185,6 +192,9 @@ app.get("/@pm2Restart", (req, res) => {
     res.end("successfully executed pm2");
   });
 });
+app.post("/@Setsettings", (req,res) => {
+  sd_.set('allowZips',req.body.allowZips);
+})
 app.post("/@login", (req, res) => {
   // let pass = notp.totp.verify(req.body.token.replace(" ", ""), KEY);
   // if (pass) {
@@ -472,6 +482,10 @@ app.post("/*@delete", (req, res) => {
 });
 
 app.get("/*@download", (req, res) => {
+  if (sd_.get('allowZips') !== true) {
+    res.end("Not Allowed to Download Zips");
+    return;
+  }
   res.filename = req.params[0];
 
   let files = null;
