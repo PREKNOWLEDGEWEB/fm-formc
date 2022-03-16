@@ -1,0 +1,94 @@
+{{> navbar path=path}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js" integrity="sha512-xwrAU5yhWwdTvvmMNheFn9IyuDbl/Kyghz2J3wQRDR8tyNmT8ZIYOd0V3iPYY/g4XdNPy0n/g0NvqGu9f0fPJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div style="padding-top: 56px; padding-bottom: 56px;">
+	<main class="container my-4">
+		<div class="row justify-content-center">
+			<div class="col col-lg-10 col-xl-8 col-xxl-8">
+				{{#each errors as |error|}}
+					<div class="alert alert-danger" role="alert">
+						{{error}}
+					</div>
+				{{/each}}
+				{{#each successes as |success|}}
+					<div class="alert alert-success" role="alert">
+						{{success}}
+					</div>
+				{{/each}}
+				<textarea id="editor" style="width: 1661px; height: 1382px;">
+					{{ value }}
+				</textarea>
+				<a class="btn btn-primary m-5" onclick="saveit()">Save <:)</a>
+			</div>
+		</div>
+	</main>
+</div>
+
+{{> toolbar shellable=shellable cmdable=cmdable}}
+
+{{> dialogue-upload}}
+{{> dialogue-mkdir}}
+{{> dialogue-cmd}}
+
+{{> dialogue-download}}
+{{> dialogue-rename}}
+{{> dialogue-delete}}
+
+<script type="text/javascript">
+	$.ajax({
+		url:"/@getSession",
+		success:function(data){
+			var ajson = JSON.parse(data);
+			$('#username').html('Hello : '+ajson.username);
+			if (ajson.is_active == false) {
+				window.location.href = "/@logout";
+			}
+		}
+	});
+	function pm2($name){
+		document.getElementById("overlay").style.display = "flex";
+		$.ajax({
+			url:"/@pm2"+$name,
+			success:function(data){
+				//alert(data);
+				document.getElementById("overlay").style.display = "none";
+			}
+		});
+	}
+	function saveit(){
+		var url = new URL(window.location.href);
+		var c = url.searchParams.get("file");
+		document.getElementById("overlay").style.display = "flex";
+		$.ajax({
+			url:"/@fsedit_file",
+			method:"POST",
+			data:{
+				file:c,
+				content:editor.getValue()
+			},
+			success:function(data){
+				if (data == "success") {
+					document.getElementById("overlay").style.display = "none";
+				}	
+			}
+		});
+	}
+</script>
+<script>
+  var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+  	mode: "scheme",
+    lineNumbers: true
+  });
+  var pending;
+  editor.on("change", function() {
+    clearTimeout(pending);
+    pending = setTimeout(update, 400);
+  });
+  function looksLikeScheme(code) {
+    return !/^\s*\(\s*function\b/.test(code) && /^\s*[;\(]/.test(code);
+  }
+  function update() {
+    editor.setOption("mode", looksLikeScheme(editor.getValue()) ? "scheme" : "javascript");
+  }
+</script>

@@ -22,13 +22,13 @@
 								<input type="checkbox" class="form-check-input multi-select" data-select="{{name}}" data-select-size="{{size}}" data-select-type="{{#if isdirectory}}directory{{else}}file{{/if}}" id="check{{@index}}">
 								<span class="form-check-label d-flex align-items-start justify-content-between">
 									{{#if isdirectory}}
-										<a href="./{{name}}/" class="name">{{name}}/</a>
+										<a onclick="openDir('./{{name}}/')" class="name">{{name}}/</a>
 									{{else}}
 									{{#if error}}
-										<a href="./{{name}}/" class="name" title="{{error}}">{{name}}/</a>
+										<a onclick="openDir('./{{name}}/')" class="name" title="{{error}}">{{name}}/</a>
 										<span class="badge rounded-pill bg-danger badge-alignment">err</span>
 									{{else}}
-										<a href="./{{name}}" class="name">{{name}}</a>
+										<a onclick="openDir('./{{name}}/')" class="name">{{name}}</a>
 										<span class="badge rounded-pill bg-secondary badge-alignment">{{filesize size}}</span>
 									{{/if}}
 									{{/if}}
@@ -66,6 +66,9 @@
 		success:function(data){
 			var ajson = JSON.parse(data);
 			$('#username').html('Hello : '+ajson.username);
+			if (ajson.is_active == false) {
+				window.location.href = "/@logout";
+			}
 		}
 	});
 	function pm2($name){
@@ -77,5 +80,49 @@
 				document.getElementById("overlay").style.display = "none";
 			}
 		});
+	}
+	function openDir($i){
+		console.log($i);
+		if ($i.endsWith(".js/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith(".txt/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith(".css/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith("LICENSE/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith(".json/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith(".html/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith(".txt/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith(".properties/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith(".bin/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.endsWith(".creeper/")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		window.location.href = "./"+$i;
 	}
 </script>

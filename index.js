@@ -12,7 +12,7 @@ const flash = require("connect-flash");
 const querystring = require("querystring");
 const assets = require("./assets");
 const archiver = require("archiver");
-
+var Udata;
 const config_ = require('./config.js');
 
 const notp = require("notp");
@@ -118,11 +118,41 @@ app.get("/@logout", (req, res) => {
 app.get("/@login", (req, res) => {
   res.render("login", flashify(req, {}));
 });
-var Udata;
+app.get("/@edit_file", (req, res) => {
+  if (req.session.login !== true) {
+    res.redirect("/@login");
+  }
+  console.log(Udata.path+"/"+req.query.file);
+  require('fs').readFile(Udata.path+req.query.file, 'utf8', function(err, data){
+    console.log(data);
+    if (err) {
+      res.render("editfile", flashify(req, {
+        value:"File not found oops"
+      }));
+      return;
+    }
+    res.render("editfile", flashify(req, {
+      value:data
+    }));
+  });
+});
+app.post("/@fsedit_file", (req, res) => {
+  if (req.session.login !== true) {
+    res.redirect("/@login");
+  }
+  require('fs').writeFile(Udata.path+req.body.file, req.body.content, 'utf-8', function (err) {
+    if (err) throw err;
+    res.end("success");
+  });
+})
 app.get("/@getSession", (req, res) => {
+  Udata = req.session.userData;
   res.end(JSON.stringify(Udata));
 });
 app.get("/@pm2Stop", (req, res) => {
+  if (req.session.login !== true) {
+    res.redirect("/@login");
+  }
   require("child_process").exec('pm2 stop '+Udata.process, (err, stdout, stderr) => {
     if (err) {
       res.end("Unable to execute Pm2");
@@ -132,6 +162,9 @@ app.get("/@pm2Stop", (req, res) => {
   });
 });
 app.get("/@pm2Start", (req, res) => {
+  if (req.session.login !== true) {
+    res.redirect("/@login");
+  }
   require("child_process").exec('pm2 start '+Udata.process, (err, stdout, stderr) => {
     if (err) {
       res.end("Unable to execute Pm2");
@@ -141,6 +174,9 @@ app.get("/@pm2Start", (req, res) => {
   });
 });
 app.get("/@pm2Restart", (req, res) => {
+  if (req.session.login !== true) {
+    res.redirect("/@login");
+  }
   require("child_process").exec('pm2 restart '+Udata.process, (err, stdout, stderr) => {
     if (err) {
       res.end("Unable to execute Pm2");
