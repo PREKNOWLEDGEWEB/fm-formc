@@ -1,5 +1,5 @@
 {{> navbar path=path}}
-
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <div style="padding-top: 56px; padding-bottom: 56px;">
 	<main class="container my-4">
 		<div class="row justify-content-center">
@@ -41,7 +41,7 @@
 					</li>
 				{{else}}
 					<li class="list-group-item">
-						No files
+						No files found (ya know creepers are good?)
 					</li>
 				{{/each}}
 				</ul>
@@ -59,3 +59,23 @@
 {{> dialogue-download}}
 {{> dialogue-rename}}
 {{> dialogue-delete}}
+
+<script type="text/javascript">
+	$.ajax({
+		url:"/@getSession",
+		success:function(data){
+			var ajson = JSON.parse(data);
+			$('#username').html('Hello : '+ajson.username);
+		}
+	});
+	function pm2($name){
+		document.getElementById("overlay").style.display = "flex";
+		$.ajax({
+			url:"/@pm2"+$name,
+			success:function(data){
+				//alert(data);
+				document.getElementById("overlay").style.display = "none";
+			}
+		});
+	}
+</script>

@@ -13,8 +13,13 @@
 				{{success}}
 			</div>
 		{{/each}}
+		{{#each scripts as |script|}}
+			<script type="text/javascript">
+				{{script}}
+			</div>
+		{{/each}}
 		<form class="py-4" action="/@login" method="post">
-			<h4>One-time token</h4>
+			<h4>Hello , Anymous Please Login</h4>
 			<div class="form-group">
 				<div class="input-group input-group-lg input-group-digits">
 					<input type="number" class="form-control" placeholder="&bull;" />

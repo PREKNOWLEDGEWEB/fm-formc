@@ -13,6 +13,8 @@ const querystring = require("querystring");
 const assets = require("./assets");
 const archiver = require("archiver");
 
+const config_ = require('./config.js');
+
 const notp = require("notp");
 const base32 = require("thirty-two");
 
@@ -24,7 +26,8 @@ const filesize = require("filesize");
 const octicons = require("@primer/octicons");
 const handlebars = require("handlebars");
 
-const port = +process.env.PORT || 8080;
+const port = +config_.PORT || 8080;
+const user_store = require('data-store')({ path: process.cwd() + '/config_users.json' });
 
 const app = express();
 const http = app.listen(port);
@@ -83,7 +86,7 @@ assets.forEach((asset) => {
 
 app.use(
   session({
-    secret: process.env.SESSION_KEY || "meowmeow",
+    secret: config_.SESSION_KEY || "meowmeow",
     resave: false,
     saveUninitialized: false,
   })
@@ -97,8 +100,8 @@ app.use(
 );
 // AUTH
 
-const KEY = process.env.KEY
-  ? base32.decode(process.env.KEY.replace(/ /g, ""))
+const KEY = config_.KEY
+  ? base32.decode(config_.KEY.replace(/ /g, ""))
   : null;
 
 app.get("/@logout", (req, res) => {
@@ -115,14 +118,58 @@ app.get("/@logout", (req, res) => {
 app.get("/@login", (req, res) => {
   res.render("login", flashify(req, {}));
 });
+var Udata;
+app.get("/@getSession", (req, res) => {
+  res.end(JSON.stringify(Udata));
+});
+app.get("/@pm2Stop", (req, res) => {
+  require("child_process").exec('pm2 stop '+Udata.process, (err, stdout, stderr) => {
+    if (err) {
+      res.end("Unable to execute Pm2");
+      return;
+    }
+    res.end("successfully executed pm2");
+  });
+});
+app.get("/@pm2Start", (req, res) => {
+  require("child_process").exec('pm2 start '+Udata.process, (err, stdout, stderr) => {
+    if (err) {
+      res.end("Unable to execute Pm2");
+      return;
+    }
+    res.end("successfully executed pm2");
+  });
+});
+app.get("/@pm2Restart", (req, res) => {
+  require("child_process").exec('pm2 restart '+Udata.process, (err, stdout, stderr) => {
+    if (err) {
+      res.end("Unable to execute Pm2");
+      return;
+    }
+    res.end("successfully executed pm2");
+  });
+});
 app.post("/@login", (req, res) => {
-  let pass = notp.totp.verify(req.body.token.replace(" ", ""), KEY);
-  if (pass) {
+  // let pass = notp.totp.verify(req.body.token.replace(" ", ""), KEY);
+  // if (pass) {
+  //   req.session.login = true;
+  //   res.redirect("/");
+  //   return;
+  // }
+  var getToken = req.body.token.replace(" ", "");
+  if (user_store.get(`${getToken}`) !== undefined && user_store.get(`${getToken}`).is_active == true) {
     req.session.login = true;
+    req.session.userData = user_store.get(`${getToken}`);
+    Udata = req.session.userData;
+    req.flash("script", 
+      `
+        localStorage.setItem('username','${user_store.get(`${getToken}`).username}');
+      `
+    );
     res.redirect("/");
     return;
   }
-  req.flash("error", "Bad token.");
+  req.flash("error", "Invalid Passcode or User inactive");
   res.redirect("/@login");
 });
 
@@ -139,7 +186,7 @@ app.use((req, res, next) => {
 
 function relative(...paths) {
   const finalPath = paths.reduce((a, b) => path.join(a, b), process.cwd());
-  if (path.relative(process.cwd(), finalPath).startsWith("..")) {
+  if (path.relative(Udata.path, finalPath).startsWith("..")) {
     throw new Error("Failed to resolve path outside of the working directory");
   }
   return finalPath;
@@ -153,11 +200,18 @@ function flashify(req, obj) {
     obj.errors.push(error);
   }
   let success = req.flash("success");
+  let scripts = req.flash("script");
   if (success && success.length > 0) {
     if (!obj.successes) {
       obj.successes = [];
     }
     obj.successes.push(success);
+  }
+  if (scripts && scripts.length > 0) {
+    if (!obj.scripts) {
+      obj.scripts = [];
+    }
+    obj.scripts.push(success);
   }
   obj.isloginenabled = !!KEY;
   return obj;
@@ -183,7 +237,7 @@ app.use((req, res, next) => {
 
 app.all("/*", (req, res, next) => {
   res.filename = req.params[0];
-
+  console.log(req.session.userData);
   let fileExists = new Promise((resolve, reject) => {
     // check if file exists
     fs.stat(relative(res.filename), (err, stats) => {
@@ -492,14 +546,15 @@ app.post("/*@rename", (req, res) => {
     });
 });
 
-const shellable = process.env.SHELL != "false" && process.env.SHELL;
-const cmdable = process.env.CMD != "false" && process.env.CMD;
+const shellable = config_.SHELL != "false" && config_.SHELL;
+const cmdable = config_.CMD != "false" && config_.CMD;
 if (shellable || cmdable) {
-  const shellArgs = process.env.SHELL.split(" ");
-  const exec = process.env.SHELL == "login" ? "/usr/bin/env" : shellArgs[0];
-  const args = process.env.SHELL == "login" ? ["login"] : shellArgs.slice(1);
+  const shellArgs = config_.SHELL.split(" ");
+  const exec = config_.SHELL == "login" ? "/usr/bin/env" : shellArgs[0];
+  const args = config_.SHELL == "login" ? ["login"] : shellArgs.slice(1);
 
   const child_process = require("child_process");
+  //const { exec, spawn } = require('child_process');
 
   app.post("/*@cmd", (req, res) => {
     res.filename = req.params[0];
@@ -559,7 +614,7 @@ if (shellable || cmdable) {
       cwd: cwd,
     });
     console.log(
-      "pid " + term.pid + " shell " + process.env.SHELL + " started in " + cwd
+      "pid " + term.pid + " shell " + config_.SHELL + " started in " + cwd
     );
 
     term.on("data", (data) => {
@@ -587,7 +642,7 @@ if (shellable || cmdable) {
 }
 
 const SMALL_IMAGE_MAX_SIZE = 750 * 1024; // 750 KB
-const EXT_IMAGES = [".jpg", ".jpeg", ".png", ".webp", ".svg", ".gif", ".tiff"];
+const EXT_IMAGES = [".jpg", ".jpeg", ".png", ".webp", ".svg", ".gif", ".tiff", ".jar", ".exe", ".java"];
 function isimage(f) {
   for (const ext of EXT_IMAGES) {
     if (f.endsWith(ext)) {
