@@ -1,8 +1,15 @@
 {
 	"123456":{
-		"is_admin":true,
+		"is_admin":false,
 		"username":"Admino",
-		"path":"D:/",
+		"path":".",
+		"process":"0",
+		"is_active":true
+	},
+	"829121":{
+		"is_admin":true,
+		"username":"829121",
+		"path":".",
 		"process":"0",
 		"is_active":true
 	}

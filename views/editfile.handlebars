@@ -1,4 +1,7 @@
 {{> navbar path=path}}
+<link rel="stylesheet" type="text/css" href="https://ace.c9.io/api/resources/csses/ace_api.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.min.js" integrity="sha512-hDyKEpCc9jPn3u2VffFjScCtNqZI+BAbThAhhDYqqqZbxMqmTSNIgdU0OU9BRD/8wFxHIWLAo561hh9fW7j6sA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-beautify.js" type="text/javascript" charset="utf-8"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js" integrity="sha512-xwrAU5yhWwdTvvmMNheFn9IyuDbl/Kyghz2J3wQRDR8tyNmT8ZIYOd0V3iPYY/g4XdNPy0n/g0NvqGu9f0fPJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -16,10 +19,18 @@
 						{{success}}
 					</div>
 				{{/each}}
-				<textarea id="editor" style="width: 1661px; height: 1382px;">
-					{{ value }}
-				</textarea>
-				<a class="btn btn-primary m-5" onclick="saveit()">Save <:)</a>
+				<style type="text/css" media="screen">
+					    #editor { 
+					        top: 0;
+					        width: 850px;
+					        height: 350px;
+					        right: 0;
+					        bottom: 0;
+					        left: 0;
+					    }
+					</style>
+				<div id="editor">{{ value }}</div>
+				<a class="btn btn-primary " style="margin-top:25px;" onclick="saveit()">Save <:)</a>
 			</div>
 		</div>
 	</main>
@@ -76,19 +87,25 @@
 	}
 </script>
 <script>
-  var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
-  	mode: "scheme",
-    lineNumbers: true
-  });
-  var pending;
-  editor.on("change", function() {
-    clearTimeout(pending);
-    pending = setTimeout(update, 400);
-  });
-  function looksLikeScheme(code) {
-    return !/^\s*\(\s*function\b/.test(code) && /^\s*[;\(]/.test(code);
-  }
-  function update() {
-    editor.setOption("mode", looksLikeScheme(editor.getValue()) ? "scheme" : "javascript");
-  }
+  // var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+  // 	mode: "scheme",
+  //   lineNumbers: true
+  // });
+  // var pending;
+  // editor.on("change", function() {
+  //   clearTimeout(pending);
+  //   pending = setTimeout(update, 400);
+  // });
+  // function looksLikeScheme(code) {
+  //   return !/^\s*\(\s*function\b/.test(code) && /^\s*[;\(]/.test(code);
+  // }
+  // function update() {
+  //   editor.setOption("mode", looksLikeScheme(editor.getValue()) ? "scheme" : "javascript");
+  // }
+  var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+	ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/') 
+  var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+   // beautify.beautify(editor.session);
+    editor.session.setMode("ace/mode/javascript");
 </script>

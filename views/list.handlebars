@@ -1,5 +1,5 @@
 {{> navbar path=path}}
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <div style="padding-top: 56px; padding-bottom: 56px;">
 	<main class="container my-4">
 		<div class="row justify-content-center">
@@ -25,10 +25,10 @@
 										<a onclick="openDir('./{{name}}/')" class="name">{{name}}/</a>
 									{{else}}
 									{{#if error}}
-										<a onclick="openDir('./{{name}}/')" class="name" title="{{error}}">{{name}}/</a>
+										<a onclick="openDir('./{{name}}')" class="name" title="{{error}}">{{name}}/</a>
 										<span class="badge rounded-pill bg-danger badge-alignment">err</span>
 									{{else}}
-										<a onclick="openDir('./{{name}}/')" class="name">{{name}}</a>
+										<a onclick="openDir('./{{name}}')" class="name">{{name}}</a>
 										<span class="badge rounded-pill bg-secondary badge-alignment">{{filesize size}}</span>
 									{{/if}}
 									{{/if}}
@@ -86,47 +86,55 @@
 	}
 	function openDir($i){
 		console.log($i);
-		if ($i.endsWith(".js/")) {
+		if ($i.endsWith(".js")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith(".txt/")) {
+		if ($i.endsWith(".txt")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith(".css/")) {
+		if ($i.endsWith(".css")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith("LICENSE/")) {
+		if ($i.endsWith("LICENSE")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith(".json/")) {
+		if ($i.endsWith(".json")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith(".html/")) {
+		if ($i.endsWith(".html")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith(".txt/")) {
+		if ($i.endsWith(".txt")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith(".properties/")) {
+		if ($i.endsWith(".properties")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith(".bin/")) {
+		if ($i.endsWith(".bin")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
-		if ($i.endsWith(".creeper/")) {
+		if ($i.endsWith(".creeper")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}
 		if ($i.includes(".console_history")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.includes(".yml")) {
+			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
+			return;
+		}
+		if ($i.includes(".yaml")) {
 			window.location.href = "/@edit_file?file="+window.location.pathname+$i;
 			return;
 		}

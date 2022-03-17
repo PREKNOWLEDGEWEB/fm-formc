@@ -130,8 +130,8 @@ app.get("/@edit_file", (req, res) => {
     res.redirect("/@login");
   }
   console.log(Udata.path+"/"+req.query.file);
-  require('fs').readFile(Udata.path+req.query.file, 'utf8', function(err, data){
-    console.log(data);
+  require('fs').readFile(Udata.path+req.query.file , function(err, data){
+    //console.log(data);
     if (err) {
       res.render("editfile", flashify(req, {
         value:"File not found oops"
