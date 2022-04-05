@@ -1,0 +1,9 @@
+{
+	"smp1":{
+		"shell":"node.exe",
+		"args":[
+			""
+		]
+	},
+	"smp2":"node.exe"
+}

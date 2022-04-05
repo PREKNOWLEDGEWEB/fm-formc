@@ -654,6 +654,15 @@ if (shellable || cmdable) {
     );
   });
 
+  app.get("/*@konsole", (req, res) => {
+    res.render(
+      "konsole",
+      flashify(req, {
+        path: res.filename,
+      })
+    );
+  });
+
   const ws = new WebSocket.Server({ server: http });
   ws.on("connection", (socket, request) => {
     const { path } = querystring.parse(request.url.split("?")[1]);

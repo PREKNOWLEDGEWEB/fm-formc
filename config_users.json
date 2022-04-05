@@ -1,15 +1,8 @@
 {
-	"123456":{
-		"is_admin":false,
-		"username":"Admino",
-		"path":".",
-		"process":"0",
-		"is_active":true
-	},
-	"829121":{
+	"326521":{
 		"is_admin":true,
 		"username":"829121",
-		"path":".",
+		"path":"/Users/minecraftsmp/WTT_SMP/",
 		"process":"0",
 		"is_active":true
 	}

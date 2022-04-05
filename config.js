@@ -5,5 +5,5 @@ var isWin = process.platform === "win32";
 if (isWin) {
 	module.exports.SHELL = "powershell.exe";
 }else{
-	module.exports.SHELL = "/bin/bash";
+	module.exports.SHELL = "/bin/zsh";
 }
